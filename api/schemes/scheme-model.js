@@ -170,8 +170,8 @@ async function add(scheme) { // EXERCISE D
     and resolves to _all the steps_ belonging to the given `scheme_id`,
     including the newly created one.
   */
-    step = {...step,scheme_id}
-   await db("steps").insert(step)
+
+   await db("steps").insert({...step,scheme_id})
   return findSteps(scheme_id)
 }
 
