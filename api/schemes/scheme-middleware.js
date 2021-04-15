@@ -31,7 +31,7 @@ const checkSchemeId = async (req, res, next) => {
 */
 const validateScheme = (req, res, next) => {
   const {scheme_name} = req.body;
-  if (!scheme_name || scheme_name.length<1 || typeof scheme_name !== 'string'){
+  if (!scheme_name || typeof scheme_name !== 'string' || scheme_name.length<1 ){
     next()
   }
   else{
