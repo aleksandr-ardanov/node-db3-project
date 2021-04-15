@@ -1,3 +1,5 @@
+const db = require('../../data/db-config')
+
 function find() { // EXERCISE A
   /*
     1A- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`.
@@ -15,9 +17,15 @@ function find() { // EXERCISE A
     2A- When you have a grasp on the query go ahead and build it in Knex.
     Return from this function the resulting dataset.
   */
+  return db("schemes as sc")
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
+    .select('sc.*')
+    .count('st.step_id as number_of_steps')
+    .groupBy('sc.scheme_id')
+    .orderBy('sc.scheme_id', 'asc')
 }
 
-function findById(scheme_id) { // EXERCISE B
+async function findById(scheme_id) { // EXERCISE B
   /*
     1B- Study the SQL query below running it in SQLite Studio against `data/schemes.db3`:
 
@@ -83,6 +91,34 @@ function findById(scheme_id) { // EXERCISE B
         "steps": []
       }
   */
+
+  const arrScheme = await db("schemes as sc")
+        .leftJoin("steps as st","sc.scheme_id","st.scheme_id")
+        .where('sc.scheme_id',scheme_id)
+        .select("sc.scheme_name","st.*",'sc.scheme_id')
+        .orderBy('st.step_number', 'asc')
+  
+  if (arrScheme.length>0){
+  const step =  arrScheme.map(item => {
+    if (item.step_id && item.step_number && item.instructions){
+    return({
+      step_id:item.step_id,
+      step_number:item.step_number,
+      instructions:item.instructions
+    })
+    }
+  })
+
+  const arrayToReturn = {
+    scheme_id:arrScheme[0].scheme_id,
+    scheme_name:arrScheme[0].scheme_name,
+    steps: step.some(item => item ===undefined) ? [] : step
+  }
+  return arrayToReturn
+  }
+  else{
+    return null
+  }
 }
 
 function findSteps(scheme_id) { // EXERCISE C
